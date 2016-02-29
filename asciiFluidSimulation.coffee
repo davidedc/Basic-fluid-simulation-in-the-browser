@@ -4,8 +4,8 @@ CONSOLE_HEIGHT = 24
 
 
 particles = []
-
 totalOfParticles = 0
+
 gravity = 1
 pressure = 4
 viscosity = 7
@@ -22,58 +22,66 @@ class Particle
 	xPos: 0.0
 	yPos: 0.0
 
-particlesCounter = 0
-xSandboxAreaScan = 0
-ySandboxAreaScan = 0
 
-for x in pourout
-	#console.log i
-	# read the input file to initialise the particles.
-	# stands for "wall", i.e. unmovable particles (very high density)
-	# any other non-space character represents normal particles.
-	#while ((x = getc(stdin)) != EOF) {
+loadExample = (selectedExample) ->
+	if !selectedExample?
+		selectedExample = document.getElementById("exampleSelection")
+		selectedExample = selectedExample.options[selectedExample.selectedIndex].value
 
-	if x == '\n'
-		# next row
-		# rewind the x to -1 cause it's gonna be incremented at the
-		# end of the while body
-		ySandboxAreaScan += 2
-		xSandboxAreaScan = -1
+	particles = []
+	totalOfParticles = 0
+	xSandboxAreaScan = 0
+	ySandboxAreaScan = 0
+	particlesCounter = 0
 
-	else if x != ' '
-		particles.push new Particle()
-		particles.push new Particle()
+	for x in window[selectedExample]
+		#console.log i
+		# read the input file to initialise the particles.
+		# stands for "wall", i.e. unmovable particles (very high density)
+		# any other non-space character represents normal particles.
+		#while ((x = getc(stdin)) != EOF) {
 
-		if x == "#"
-			#debugger
-			# The character # represents “wall particle” (a particle with fixed position),
-			# and any other non-space characters represent free particles.
-			# A wall sets the flag on 2 particles side by side.
-			particles[particlesCounter].wallflag = particles[particlesCounter + 1].wallflag = 1
+		if x == '\n'
+			# next row
+			# rewind the x to -1 cause it's gonna be incremented at the
+			# end of the while body
+			ySandboxAreaScan += 2
+			xSandboxAreaScan = -1
 
-		# Each non-empty character sets the position of two
-		# particles one below the other (real part is rows)
-		# i.e. each cell in the input file corresponds to 1x2 particle spaces,
-		# and each character sets two particles
-		# one on top of each other.
-		# It's as if the input map maps to a space that has twice the height, as if the vertical
-		# resolution was higher than the horizontal one.
-		# This is corrected later, see "y scale correction" comment.
-		# I think this is because of gravity simulation, the vertical resolution has to be
-		# higher, or conversely you can get away with simulating a lot less of what goes on in the
-		# horizontal axis.
-		particles[particlesCounter].xPos = xSandboxAreaScan
-		particles[particlesCounter].yPos = ySandboxAreaScan
+		else if x != ' '
+			particles.push new Particle()
+			particles.push new Particle()
 
-		particles[particlesCounter + 1].xPos = xSandboxAreaScan
-		particles[particlesCounter + 1].yPos = ySandboxAreaScan + 1
+			if x == "#"
+				#debugger
+				# The character # represents “wall particle” (a particle with fixed position),
+				# and any other non-space characters represent free particles.
+				# A wall sets the flag on 2 particles side by side.
+				particles[particlesCounter].wallflag = particles[particlesCounter + 1].wallflag = 1
 
-		# we just added two particles
-		particlesCounter += 2
-		totalOfParticles = particlesCounter
+			# Each non-empty character sets the position of two
+			# particles one below the other (real part is rows)
+			# i.e. each cell in the input file corresponds to 1x2 particle spaces,
+			# and each character sets two particles
+			# one on top of each other.
+			# It's as if the input map maps to a space that has twice the height, as if the vertical
+			# resolution was higher than the horizontal one.
+			# This is corrected later, see "y scale correction" comment.
+			# I think this is because of gravity simulation, the vertical resolution has to be
+			# higher, or conversely you can get away with simulating a lot less of what goes on in the
+			# horizontal axis.
+			particles[particlesCounter].xPos = xSandboxAreaScan
+			particles[particlesCounter].yPos = ySandboxAreaScan
 
-	# next column
-	xSandboxAreaScan += 1
+			particles[particlesCounter + 1].xPos = xSandboxAreaScan
+			particles[particlesCounter + 1].yPos = ySandboxAreaScan + 1
+
+			# we just added two particles
+			particlesCounter += 2
+			totalOfParticles = particlesCounter
+
+		# next column
+		xSandboxAreaScan += 1
 
 
 calculateDensities = (particles, totalOfParticles)->
