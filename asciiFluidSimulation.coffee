@@ -2,33 +2,31 @@
 CONSOLE_WIDTH = 80
 CONSOLE_HEIGHT = 24
 
-xSandboxAreaScan = 0
-ySandboxAreaScan = 0
 
 particles = []
 
-xParticleDistance = 0.0
-yParticleDistance = 0.0
-particlesInteraction = 0.0
-particlesDistance = 0.0
-
-x = 0
-y = 0
-screenBufferIndex = 0
 totalOfParticles = 0
 gravity = 1
 pressure = 4
 viscosity = 7
 
-screenBuffer = []
 
-document.getElementById("simulationOutput").innerHTML = ""
-
-#document.getElementById("simulationOutput").innerHTML = column2
-
+class Particle
+	density: 0.0
+	xForce: 0.0
+	xVelocity: 0.0
+	yForce: 0.0
+	yVelocity: 0.0
+	wallflag: 0
+	dead: false
+	xPos: 0.0
+	yPos: 0.0
 
 particlesCounter = 0
-for x in column2
+xSandboxAreaScan = 0
+ySandboxAreaScan = 0
+
+for x in pourout
 	#console.log i
 	# read the input file to initialise the particles.
 	# stands for "wall", i.e. unmovable particles (very high density)
@@ -43,23 +41,8 @@ for x in column2
 		xSandboxAreaScan = -1
 
 	else if x != ' '
-		newParticle = {}
-		newParticle.density = 0.0
-		newParticle.xForce = 0.0
-		newParticle.xVelocity = 0.0
-		newParticle.yForce = 0.0
-		newParticle.yVelocity = 0.0
-		newParticle.wallflag = 0
-		particles.push newParticle
-
-		newParticle = {}
-		newParticle.density = 0.0
-		newParticle.xForce = 0.0
-		newParticle.xVelocity = 0.0
-		newParticle.yForce = 0.0
-		newParticle.yVelocity = 0.0
-		newParticle.wallflag = 0
-		particles.push newParticle
+		particles.push new Particle()
+		particles.push new Particle()
 
 		if x == "#"
 			#debugger
@@ -92,18 +75,26 @@ for x in column2
 	# next column
 	xSandboxAreaScan += 1
 
-simulationNextStep = ->
-	debugger
-	#Iterate over every pair of particles to calculate the densities
+
+calculateDensities = (particles, totalOfParticles)->
+	particlesCursor = 0
+	particlesCursor2 = 0
 	for particlesCursor in [0... totalOfParticles]
+
+		if particles[particlesCursor].dead
+			continue
+
 		# density of "wall" particles is high, other particles will bounce off them.
 		particles[particlesCursor].density = particles[particlesCursor].wallflag * 9
 
 		for particlesCursor2 in [0... totalOfParticles]
 
+			if particles[particlesCursor2].dead
+				continue
+
 			xParticleDistance = particles[particlesCursor].xPos - particles[particlesCursor2].xPos
 			yParticleDistance = particles[particlesCursor].yPos - particles[particlesCursor2].yPos
-			particlesDistance = Math.sqrt( Math.pow(xParticleDistance,2.0) + Math.pow(yParticleDistance,2.0))
+			particlesDistance = Math.sqrt( xParticleDistance * xParticleDistance + yParticleDistance * yParticleDistance)
 			particlesInteraction = particlesDistance / 2.0 - 1.0
 
 			# this line here with the alternative test
@@ -113,17 +104,25 @@ simulationNextStep = ->
 			# density is updated only if particles are close enough
 			if Math.floor(1.0 - particlesInteraction) > 0
 				particles[particlesCursor].density += particlesInteraction * particlesInteraction
+	return
+
+calculateForces = (particles, totalOfParticles) ->
+	particlesCursor = 0
+	particlesCursor2 = 0
 
     # Iterate over every pair of particles to calculate the forces
 	for particlesCursor in [0...  totalOfParticles]
+		if particles[particlesCursor].wallflag == 1 or particles[particlesCursor].dead
+			continue
 		particles[particlesCursor].yForce = gravity
 		particles[particlesCursor].xForce = 0
 
 		for particlesCursor2 in [0...  totalOfParticles]
-
+			if particles[particlesCursor2].dead
+				continue
 			xParticleDistance = particles[particlesCursor].xPos - particles[particlesCursor2].xPos
 			yParticleDistance = particles[particlesCursor].yPos - particles[particlesCursor2].yPos
-			particlesDistance = Math.sqrt( Math.pow(xParticleDistance,2.0) + Math.pow(yParticleDistance,2.0))
+			particlesDistance = Math.sqrt( xParticleDistance * xParticleDistance + yParticleDistance * yParticleDistance)
 			particlesInteraction = particlesDistance / 2.0 - 1.0
 
 			# force is updated only if particles are close enough
@@ -132,15 +131,25 @@ simulationNextStep = ->
 				  viscosity - particles[particlesCursor2].xVelocity * viscosity) / particles[particlesCursor].density
 				particles[particlesCursor].yForce += particlesInteraction * (yParticleDistance * (3 - particles[particlesCursor].density - particles[particlesCursor2].density) * pressure + particles[particlesCursor].yVelocity *
 				  viscosity - particles[particlesCursor2].yVelocity * viscosity) / particles[particlesCursor].density
+	return
+
+simulationNextStep = ->
+	#debugger
+	#Iterate over every pair of particles to calculate the densities
+	calculateDensities particles, totalOfParticles
+	calculateForces particles, totalOfParticles
+
 
 	# empty the buffer
+	screenBuffer = []
+	screenBufferIndex = 0
 	for screenBufferIndex in [0... CONSOLE_WIDTH * CONSOLE_HEIGHT]
 		screenBuffer[screenBufferIndex] = 0
 
-	debugger
+	#debugger
 	for particlesCursor in [0... totalOfParticles]
 
-		if !particles[particlesCursor].wallflag
+		if particles[particlesCursor].wallflag == 0
 			
 			# This is the newtonian mechanics part: knowing the force vector acting on each
 			# particle, we accelerate the particle (see the change in velocity).
@@ -149,7 +158,7 @@ simulationNextStep = ->
 			# acceleration is proportional to the force.
 
 			# force affects velocity
-			if Math.sqrt( Math.pow(particles[particlesCursor].xForce ,2.0) + Math.pow(particles[particlesCursor].yForce,2.0)) < 4.2
+			if Math.sqrt( particles[particlesCursor].xForce * particles[particlesCursor].xForce + particles[particlesCursor].yForce * particles[particlesCursor].yForce) < 4.2
 				particles[particlesCursor].xVelocity += particles[particlesCursor].xForce / 10
 				particles[particlesCursor].yVelocity += particles[particlesCursor].yForce / 10
 			else
@@ -217,17 +226,21 @@ simulationNextStep = ->
 			# now the cell in row below
 			screenBuffer[screenBufferIndex + CONSOLE_WIDTH]   |= 2 # set 2nd bit to 1
 			screenBuffer[screenBufferIndex + CONSOLE_WIDTH + 1] |= 1 # set 1st bit to 1
+		else
+			particles[particlesCursor].dead = true
 
 	# Update the screen buffer
-	debugger
+	#debugger
+	screenBufferString = ''
 	for screenBufferIndex in [0... CONSOLE_WIDTH * CONSOLE_HEIGHT]
 		if screenBufferIndex % CONSOLE_WIDTH == CONSOLE_WIDTH - 1
-			screenBuffer[screenBufferIndex] = '<br>'
+			screenBufferString += '<br>'
 		else
 			# the string below contains 16 characters, which is for all
 			# the possible combinations of values in the screenbuffer since
 			# it can be subject to flipping of the first 4 bits
-			screenBuffer[screenBufferIndex] = " '`-.|//,\\|\\_\\/#"[screenBuffer[screenBufferIndex]]
+			screenBufferString += " '`-.|//,\\|\\_\\/#"[screenBuffer[screenBufferIndex]]
+			#screenBufferString += "#"
 			# ---------------------- the mappings --------------
 			# 0  maps into space
 			# 1  maps into '    2  maps into `    3  maps into -
@@ -237,6 +250,6 @@ simulationNextStep = ->
 			# 13 maps into \    14 maps into /    15 maps into #
 
 	# terminal escape code to put cursor back to the top left of the screen
-	document.getElementById("simulationOutput").innerHTML = screenBuffer.join("").replace(/ /g,"&nbsp;")
-	debugger
+	document.getElementById("simulationOutput").innerHTML = screenBufferString.replace(/ /g,"&nbsp;")
+	#debugger
 	window.requestAnimationFrame(simulationNextStep)
