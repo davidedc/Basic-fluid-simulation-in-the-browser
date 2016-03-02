@@ -51,7 +51,7 @@ loadExample = function(selectedExample) {
   xSandboxAreaScan = 0;
   ySandboxAreaScan = 0;
   particlesCounter = 0;
-  ref = window[selectedExample];
+  ref = examples[selectedExample].data;
   results = [];
   for (i = 0, len = ref.length; i < len; i++) {
     x = ref[i];
