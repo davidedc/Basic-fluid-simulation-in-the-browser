@@ -1,4 +1,8 @@
-column = \
+examples = {}
+
+examples.column = {}
+examples.column.name = "column"
+examples.column.data = \
 """
 
 
@@ -25,8 +29,9 @@ column = \
  ########################################################################
 """
 
-
-column2 = \
+examples.column2 = {}
+examples.column2.name = "column 2"
+examples.column2.data = \
 """
 
 
@@ -51,7 +56,10 @@ column2 = \
  ############################################################################
 """
 
-clock = \
+
+examples.clock = {}
+examples.clock.name = "clock"
+examples.clock.data = \
 """
                        ########################
                        ##xxxxxxxxxxxxxxxxxxxx##
@@ -78,7 +86,9 @@ clock = \
                        ########################
 """
 
-terraces = \
+examples.terraces = {}
+examples.terraces.name = "terraces"
+examples.terraces.data = \
 """
 
 
@@ -101,7 +111,9 @@ terraces = \
                                                             ############
 """
 
-pourout = \
+examples.pourout = {}
+examples.pourout.name = "pour-out"
+examples.pourout.data = \
 """
 
      ### . . . . . . . . . . . ###
