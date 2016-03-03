@@ -2,7 +2,7 @@
 
 A very simple fluid simulation running in your browser.
 
-see the ["demo"](http://davidedc.github.io/Basic-fluid-simulation-in-the-browser/)
+[Demo here.](http://davidedc.github.io/Basic-fluid-simulation-in-the-browser/)
 
 ![demo animation](https://raw.githubusercontent.com/davidedc/Basic-fluid-simulation-in-the-browser/master/readme-images/demo.gif)
 
