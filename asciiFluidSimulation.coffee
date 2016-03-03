@@ -1,4 +1,3 @@
-
 CONSOLE_WIDTH = 80
 CONSOLE_HEIGHT = 24
 
@@ -34,7 +33,7 @@ loadExample = (selectedExample) ->
 	ySandboxAreaScan = 0
 	particlesCounter = 0
 
-	for x in window[selectedExample]
+	for x in examples[selectedExample].data
 		#console.log i
 		# read the input file to initialise the particles.
 		# stands for "wall", i.e. unmovable particles (very high density)

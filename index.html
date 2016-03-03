@@ -3,18 +3,34 @@
 <body>
 
 <select onchange="loadExample()" id="exampleSelection">
-  <option value="clock">clock</option>
-  <option value="pourout">pour-out</option>
-  <option value="column2">column2</option>
-  <option value="terraces">terraces</option>
 </select>
 
 <div id="simulationOutput" style="font-family:'Courier'; font-size:small;">
 
 <script src="examples.js"></script>
+
+<script>
+// this just populates the selectbox at the top
+// of the page with all the examples in the
+// examples.js file
+
+var eachExample, exampleData, exampleName, opt, sel;
+
+sel = document.getElementById('exampleSelection');
+
+for (eachExample in examples) {
+  exampleName = examples[eachExample].name;
+  exampleData = examples[eachExample].data;
+  opt = document.createElement('option');
+  opt.appendChild(document.createTextNode(exampleName));
+  opt.value = "" + eachExample;
+  sel.appendChild(opt);
+}
+</script>
+
 <script src="asciiFluidSimulation.js"></script>
 <script>
-	loadExample("clock");
+	loadExample();
 	window.requestAnimationFrame(simulationNextStep);
 </script>
 
