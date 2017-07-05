@@ -6,6 +6,8 @@ A very simple fluid simulation running in your browser.
 
 ![demo animation](https://raw.githubusercontent.com/davidedc/Basic-fluid-simulation-in-the-browser/master/readme-images/demo.gif)
 
+For more info on the how the Smoothed-particle hydrodynamics (SPH) method is implemented, see [this readme in my other related github project](https://github.com/davidedc/Ascii-fluid-simulation-deobfuscated/blob/master/readme.md).
+
 # Hack it!
 
 ...just hack the javascript files.
